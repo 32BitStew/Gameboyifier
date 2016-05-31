@@ -1,17 +1,15 @@
-import java.io.File;
-
-import javax.imageio.*;
-
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import java.io.IOException;
-
-import java.awt.Color;
+import java.io.File;
 
 import java.lang.Math;
 
 import java.util.Arrays;
+
+import javax.imageio.*;
 
 public class Gameboyifier {
   private final boolean FORCE_PNG = true;
@@ -23,31 +21,26 @@ public class Gameboyifier {
 
     //GETTING ORIGINAL IMAGE
     BufferedImage img = null;
+    img = readImage(path);
 
-    try {
-      img = ImageIO.read(new File(path));
-    } catch (IOException e) {
-      System.out.println(e);
-      System.exit(1);
-    }
-
+    //FILTERING IMAGE
     gameboyify(img);
+    
+    //WRITING NEW IMAGE
     System.out.println(path);
-    String[] nameParts = path.split("\\.");
-    System.out.println(Arrays.toString(nameParts));
-    String extension = nameParts[nameParts.length - 1];
+    String extension = getFileExtension(path);
     String outputFileName = path.substring(0,path.length() - extension.length() - 1) + "GB." + (FORCE_PNG ? "png" : extension);
 
     System.out.println(outputFileName);
-    try {
-      if(FORCE_PNG) ImageIO.write(img,"png",new File(outputFileName));
-      else ImageIO.write(img,extension,new File(outputFileName));
-    } catch (IOException e) {
-      System.out.println(e);
-      System.exit(1);
-    }
 
+    writeImage(outputFileName, img);
     System.out.println("Done!");
+  }
+  
+  public String getFileExtension(String path) {
+    String[] nameParts = path.split("\\.");
+    System.out.println(Arrays.toString(nameParts));
+    return nameParts[nameParts.length - 1];
   }
 
   public void gameboyify(BufferedImage img) {
@@ -71,6 +64,28 @@ public class Gameboyifier {
         img.setRGB(i,j,palette.getColor(smallestIndex).getRGB());
 
       }
+    }
+  }
+  
+  public BufferedImage readImage(String path) {
+    try {
+      return ImageIO.read(new File(path));
+    } catch (IOException e) {
+      System.out.println(e);
+      System.exit(1);
+    }
+    return null;
+  }
+  
+  public void writeImage(String target, BufferedImage img) {
+    String extension = getFileExtension(target);
+    
+    try {
+      if(FORCE_PNG) ImageIO.write(img,"png",new File(target));
+      else ImageIO.write(img,extension,new File(target));
+    } catch (IOException e) {
+      System.out.println(e);
+      System.exit(1);
     }
   }
 
