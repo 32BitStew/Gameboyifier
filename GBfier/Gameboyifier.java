@@ -29,12 +29,20 @@ public class Gameboyifier {
     //WRITING NEW IMAGE
     System.out.println(path);
     String extension = getFileExtension(path);
-    String outputFileName = path.substring(0,path.length() - extension.length() - 1) + "GB." + (FORCE_PNG ? "png" : extension);
+    String outputFileName = path.substring(0,path.length() - extension.length() - 1) + "GB_" + palette.getLabel() + "." + (FORCE_PNG ? "png" : extension);
 
     System.out.println(outputFileName);
 
     writeImage(outputFileName, img);
     System.out.println("Done!");
+  }
+  
+  public GBPalette getGBPalette() {
+    return palette;
+  }
+  
+  public void setGBPalette(GBPalette palette) {
+    this.palette = palette;
   }
   
   public String getFileExtension(String path) {
