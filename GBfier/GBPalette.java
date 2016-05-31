@@ -33,7 +33,7 @@ public class GBPalette {
     return palette[x];
   }
   
-  public String getLabel(String str) {
+  public String getLabel() {
     return label;
   }
 }
