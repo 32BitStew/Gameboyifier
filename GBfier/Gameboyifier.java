@@ -63,15 +63,15 @@ public class Gameboyifier {
         // **THE FOLLOWING VERSION IS A WORK IN PROGRESS FOR COMPARING DISTANCES WITHOUT ACTUALLY CALCULATING THEM**
         // **IT IS HERETO AN IMPERFECT REPLICA AND REQUIRES FURTHER EXAMINATION**
 
-        int[] componentSums = new int[4];
+        int[] componentSquaredSums = new int[4];
         int smallestIndex = 0;
-        for(int k = 0; k < componentSums.length; k++) {
+        for(int k = 0; k < componentSquaredSums.length; k++) {
           int redDist = Math.abs(pixelColor.getRed() - palette.getColor(k).getRed());
           int blueDist = Math.abs(pixelColor.getBlue() - palette.getColor(k).getBlue());
           int greenDist = Math.abs(pixelColor.getGreen() - palette.getColor(k).getGreen());
-          componentSums[k] = redDist + blueDist + greenDist;
+          componentSquaredSums[k] = redDist * redDist + blueDist * blueDist + greenDist * greenDist;
 
-          if(componentSums[k] < componentSums[smallestIndex]) {
+          if(componentSquaredSums[k] < componentSquaredSums[smallestIndex]) {
             smallestIndex = k;
           }
         }
