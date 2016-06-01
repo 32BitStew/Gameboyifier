@@ -12,29 +12,16 @@ import java.util.Arrays;
 import javax.imageio.*;
 
 public class Gameboyifier {
-  private final boolean FORCE_PNG = true;
+  private static final boolean FORCE_PNG = true;
 
   private GBPalette palette;
 
-  public Gameboyifier(String path) {
-    palette = new GBPalette();
+  public Gameboyifier() {
+    setGBPalette(new GBPalette());
+  }
 
-    //GETTING ORIGINAL IMAGE
-    BufferedImage img = null;
-    img = readImage(path);
-
-    //FILTERING IMAGE
-    gameboyify(img);
-    
-    //WRITING NEW IMAGE
-    System.out.println(path);
-    String extension = getFileExtension(path);
-    String outputFileName = path.substring(0,path.length() - extension.length() - 1) + "GB_" + palette.getLabel() + "." + (FORCE_PNG ? "png" : extension);
-
-    System.out.println(outputFileName);
-
-    writeImage(outputFileName, img);
-    System.out.println("Done!");
+  public Gameboyifier(GBPalette palette) {
+    setGBPalette(palette);
   }
   
   public GBPalette getGBPalette() {
@@ -103,6 +90,26 @@ public class Gameboyifier {
       return;
     }
 
-    new Gameboyifier(args[0]);
+    String path = args[0];
+
+    Gameboyifier gb = new Gameboyifier();
+
+    //GETTING ORIGINAL IMAGE
+    BufferedImage img = null;
+    img = gb.readImage(path);
+
+    //FILTERING IMAGE
+    gb.gameboyify(img);
+    
+    //WRITING NEW IMAGE
+    System.out.println(path);
+    String extension = gb.getFileExtension(path);
+    String outputFileName = path.substring(0,path.length() - extension.length() - 1) 
+                            + "GB_" + gb.getGBPalette().getLabel() + "." + (Gameboyifier.FORCE_PNG ? "png" : extension);
+
+    System.out.println(outputFileName);
+
+    gb.writeImage(outputFileName, img);
+    System.out.println("Done!");
   }
 }
