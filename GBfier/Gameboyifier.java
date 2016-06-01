@@ -86,13 +86,15 @@ public class Gameboyifier {
 
   public static void main(String[] args) {
     if(args.length < 1) {
-      System.out.println("Usage: java Gameboyifier [path]");
+      System.out.println("Usage: java Gameboyifier path [palette]");
       return;
     }
 
     String path = args[0];
 
-    Gameboyifier gb = new Gameboyifier();
+    Gameboyifier gb = null;
+    if(args.length < 2) gb = new Gameboyifier();
+    else gb = new Gameboyifier(new GBPalette(args[1]));
 
     //GETTING ORIGINAL IMAGE
     BufferedImage img = null;
