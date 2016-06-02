@@ -22,6 +22,22 @@ public class GBPalette {
     else this.label = "unlabeled";
   }
 
+  public GBPalette(String label) {
+    palette = null;
+    if(label.equalsIgnoreCase("CLASSIC")) {
+      this.palette = CLASSIC;
+    }else if(label.equalsIgnoreCase("POCKET")) {
+      this.palette = POCKET;
+    }else if(label.equalsIgnoreCase("AWAKENING")) {
+      this.palette = AWAKENING;
+    }
+    if(palette != null) {
+      this.label = label.toUpperCase();
+    }else{
+      System.out.println("Palette not found!");
+    }
+  }
+
   public GBPalette(Color c0, Color c1, Color c2, Color c3) {
     this.palette = new Color[] {c0,c1,c2,c3};
     this.label = "unlabeled";

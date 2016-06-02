@@ -12,29 +12,16 @@ import java.util.Arrays;
 import javax.imageio.*;
 
 public class Gameboyifier {
-  private final boolean FORCE_PNG = true;
+  private static final boolean FORCE_PNG = true;
 
   private GBPalette palette;
 
-  public Gameboyifier(String path) {
-    palette = new GBPalette();
+  public Gameboyifier() {
+    setGBPalette(new GBPalette());
+  }
 
-    //GETTING ORIGINAL IMAGE
-    BufferedImage img = null;
-    img = readImage(path);
-
-    //FILTERING IMAGE
-    gameboyify(img);
-    
-    //WRITING NEW IMAGE
-    System.out.println(path);
-    String extension = getFileExtension(path);
-    String outputFileName = path.substring(0,path.length() - extension.length() - 1) + "GB_" + palette.getLabel() + "." + (FORCE_PNG ? "png" : extension);
-
-    System.out.println(outputFileName);
-
-    writeImage(outputFileName, img);
-    System.out.println("Done!");
+  public Gameboyifier(GBPalette palette) {
+    setGBPalette(palette);
   }
   
   public GBPalette getGBPalette() {
@@ -56,19 +43,39 @@ public class Gameboyifier {
       for(int j = 0; j < img.getHeight(); j++) {
         Color pixelColor = new Color(img.getRGB(i,j));
 
-        double[] cSpaceDistances = new double[4];
+
+        // **THE FOLLOWING CODE DEMONSTRATES THE MATH INVOLVED TO ARRIVE AT AND COMPARE THE DISTANCES BETWEEN OUR TARGET PIXEL AND THE COLORS IN OUR PALETTE**
+        //
+        // double[] cSpaceDistances = new double[4];
+        // int smallestIndex = 0;
+        // for(int k = 0; k < cSpaceDistances.length; k++) {
+        //   int redDist = Math.abs(pixelColor.getRed() - palette.getColor(k).getRed());
+        //   int blueDist = Math.abs(pixelColor.getBlue() - palette.getColor(k).getBlue());
+        //   int greenDist = Math.abs(pixelColor.getGreen() - palette.getColor(k).getGreen());
+        //   cSpaceDistances[k] = Math.sqrt((redDist * redDist) + (blueDist * blueDist) + (greenDist * greenDist));
+
+        //   if(cSpaceDistances[k] < cSpaceDistances[smallestIndex]) {
+        //     smallestIndex = k;
+        //   }
+        // }
+        //
+        // **HOWEVER, BASED ON THE CONJECTURE "IF sqrt(a^2) > sqrt(b^2), THEN a^2 > b^2 AND a > b GIVEN THAT a > 1 AND b > 1"**
+        // **THE FOLLOWING VERSION IS A WORK IN PROGRESS FOR COMPARING DISTANCES WITHOUT ACTUALLY CALCULATING THEM**
+        // **IT IS HERETO AN IMPERFECT REPLICA AND REQUIRES FURTHER EXAMINATION**
+
+        int[] componentSquaredSums = new int[4];
         int smallestIndex = 0;
-        for(int k = 0; k < cSpaceDistances.length; k++) {
+        for(int k = 0; k < componentSquaredSums.length; k++) {
           int redDist = Math.abs(pixelColor.getRed() - palette.getColor(k).getRed());
           int blueDist = Math.abs(pixelColor.getBlue() - palette.getColor(k).getBlue());
           int greenDist = Math.abs(pixelColor.getGreen() - palette.getColor(k).getGreen());
-          cSpaceDistances[k] = Math.sqrt((redDist * redDist) + (blueDist * blueDist) + (greenDist * greenDist));
+          componentSquaredSums[k] = redDist * redDist + blueDist * blueDist + greenDist * greenDist;
 
-          if(cSpaceDistances[k] < cSpaceDistances[smallestIndex]) {
+          if(componentSquaredSums[k] < componentSquaredSums[smallestIndex]) {
             smallestIndex = k;
           }
         }
-        
+
         img.setRGB(i,j,palette.getColor(smallestIndex).getRGB());
 
       }
@@ -99,10 +106,32 @@ public class Gameboyifier {
 
   public static void main(String[] args) {
     if(args.length < 1) {
-      System.out.println("Usage: java Gameboyifier [path]");
+      System.out.println("Usage: java Gameboyifier path [palette]");
       return;
     }
 
-    new Gameboyifier(args[0]);
+    String path = args[0];
+
+    Gameboyifier gb = null;
+    if(args.length < 2) gb = new Gameboyifier();
+    else gb = new Gameboyifier(new GBPalette(args[1]));
+
+    //GETTING ORIGINAL IMAGE
+    BufferedImage img = null;
+    img = gb.readImage(path);
+
+    //FILTERING IMAGE
+    gb.gameboyify(img);
+    
+    //WRITING NEW IMAGE
+    System.out.println(path);
+    String extension = gb.getFileExtension(path);
+    String outputFileName = path.substring(0,path.length() - extension.length() - 1) 
+                            + "GB_" + gb.getGBPalette().getLabel() + "." + (Gameboyifier.FORCE_PNG ? "png" : extension);
+
+    System.out.println(outputFileName);
+
+    gb.writeImage(outputFileName, img);
+    System.out.println("Done!");
   }
 }
