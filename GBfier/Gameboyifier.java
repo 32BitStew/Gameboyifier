@@ -59,9 +59,8 @@ public class Gameboyifier {
         //   }
         // }
         //
-        // **HOWEVER, BASED ON THE CONJECTURE "IF sqrt(a^2) > sqrt(b^2), THEN a^2 > b^2 AND a > b GIVEN THAT a > 1 AND b > 1"**
-        // **THE FOLLOWING VERSION IS A WORK IN PROGRESS FOR COMPARING DISTANCES WITHOUT ACTUALLY CALCULATING THEM**
-        // **IT IS HERETO AN IMPERFECT REPLICA AND REQUIRES FURTHER EXAMINATION**
+        // **HOWEVER, BASED ON THE CONJECTURE "IF sqrt(a^2) > sqrt(b^2), THEN a^2 > b^2 GIVEN THAT a > 0 AND b > 0"**
+        // **THE FOLLOWING VERSION ALLOWS FOR COMPARING DISTANCES WITHOUT ACTUALLY CALCULATING THEM**
 
         int[] componentSquaredSums = new int[4];
         int smallestIndex = 0;
@@ -127,7 +126,7 @@ public class Gameboyifier {
     System.out.println(path);
     String extension = gb.getFileExtension(path);
     String outputFileName = path.substring(0,path.length() - extension.length() - 1) 
-                            + "GB_" + gb.getGBPalette().getLabel() + "." + (Gameboyifier.FORCE_PNG ? "png" : extension);
+                            + "GB_" + gb.getGBPalette().getLabel() + "." + (Gameboyifier.FORCE_PNG ? "png" : extension);;
 
     System.out.println(outputFileName);
 
