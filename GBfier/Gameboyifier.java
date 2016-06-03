@@ -5,6 +5,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.File;
 
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.lang.Math;
 
 import java.util.Arrays;
@@ -32,8 +37,8 @@ public class Gameboyifier {
     this.palette = palette;
   }
   
-  public String getFileExtension(String path) {
-    String[] nameParts = path.split("\\.");
+  public String getFileExtension(String filename) {
+    String[] nameParts = filename.split("\\.");
     System.out.println(Arrays.toString(nameParts));
     return nameParts[nameParts.length - 1];
   }
@@ -81,12 +86,11 @@ public class Gameboyifier {
     }
   }
   
-  public BufferedImage readImage(String path) {
+  public BufferedImage readImage(String filename) {
     try {
-      return ImageIO.read(new File(path));
+      return ImageIO.read(new File(filename));
     } catch (IOException e) {
       System.out.println(e);
-      System.exit(1);
     }
     return null;
   }
@@ -99,17 +103,31 @@ public class Gameboyifier {
       else ImageIO.write(img,extension,new File(target));
     } catch (IOException e) {
       System.out.println(e);
-      System.exit(1);
     }
+    return;
   }
 
   public static void main(String[] args) {
     if(args.length < 1) {
-      System.out.println("Usage: java Gameboyifier path [palette]");
+      System.out.println("Usage: java Gameboyifier filename [palette] [-R]");
       return;
     }
 
-    String path = args[0];
+    String filename = args[0];
+    Path path = Paths.get(filename);
+    
+    if(args.length > 2 && args[2].equals("-R") && new File(args[0]).isDirectory()) {
+      try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+        for(Path p : stream) {
+          main(new String[] {p.toString(),args[1],args[2]});
+        }
+      } catch (Exception e) {
+        System.out.println(e);
+      }
+      return;
+    }
+    
+    if(new File(args[0]).isDirectory()) return;
 
     Gameboyifier gb = null;
     if(args.length < 2) gb = new Gameboyifier();
@@ -117,15 +135,15 @@ public class Gameboyifier {
 
     //GETTING ORIGINAL IMAGE
     BufferedImage img = null;
-    img = gb.readImage(path);
+    img = gb.readImage(filename);
 
     //FILTERING IMAGE
     gb.gameboyify(img);
     
     //WRITING NEW IMAGE
-    System.out.println(path);
-    String extension = gb.getFileExtension(path);
-    String outputFileName = path.substring(0,path.length() - extension.length() - 1) 
+    System.out.println(filename);
+    String extension = gb.getFileExtension(filename);
+    String outputFileName = filename.substring(0,filename.length() - extension.length() - 1) 
                             + "GB_" + gb.getGBPalette().getLabel() + "." + (Gameboyifier.FORCE_PNG ? "png" : extension);;
 
     System.out.println(outputFileName);
