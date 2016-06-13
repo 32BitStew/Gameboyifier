@@ -2,23 +2,9 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
-import java.io.IOException;
-import java.io.File;
-
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.lang.Math;
 
-import java.util.Arrays;
-
-import javax.imageio.*;
-
 public class Gameboyifier {
-  private static final boolean FORCE_PNG = true;
-
   private GBPalette palette;
 
   public Gameboyifier() {
@@ -35,12 +21,6 @@ public class Gameboyifier {
   
   public void setGBPalette(GBPalette palette) {
     this.palette = palette;
-  }
-  
-  public String getFileExtension(String filename) {
-    String[] nameParts = filename.split("\\.");
-    System.out.println(Arrays.toString(nameParts));
-    return nameParts[nameParts.length - 1];
   }
 
   public void gameboyify(BufferedImage img) {
@@ -86,69 +66,7 @@ public class Gameboyifier {
     }
   }
   
-  public BufferedImage readImage(String filename) {
-    try {
-      return ImageIO.read(new File(filename));
-    } catch (IOException e) {
-      System.out.println(e);
-    }
-    return null;
-  }
-  
-  public void writeImage(String target, BufferedImage img) {
-    String extension = getFileExtension(target);
-    
-    try {
-      if(FORCE_PNG) ImageIO.write(img,"png",new File(target));
-      else ImageIO.write(img,extension,new File(target));
-    } catch (IOException e) {
-      System.out.println(e);
-    }
-    return;
-  }
 
-  public static void main(String[] args) {
-    if(args.length < 1) {
-      System.out.println("Usage: java Gameboyifier filename [palette] [-R]");
-      return;
-    }
 
-    String filename = args[0];
-    Path path = Paths.get(filename);
-    
-    if(args.length > 2 && args[2].equals("-R") && new File(args[0]).isDirectory()) {
-      try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-        for(Path p : stream) {
-          main(new String[] {p.toString(),args[1],args[2]});
-        }
-      } catch (Exception e) {
-        System.out.println(e);
-      }
-      return;
-    }
-    
-    if(new File(args[0]).isDirectory()) return;
 
-    Gameboyifier gb = null;
-    if(args.length < 2) gb = new Gameboyifier();
-    else gb = new Gameboyifier(new GBPalette(args[1]));
-
-    //GETTING ORIGINAL IMAGE
-    BufferedImage img = null;
-    img = gb.readImage(filename);
-
-    //FILTERING IMAGE
-    gb.gameboyify(img);
-    
-    //WRITING NEW IMAGE
-    System.out.println(filename);
-    String extension = gb.getFileExtension(filename);
-    String outputFileName = filename.substring(0,filename.length() - extension.length() - 1) 
-                            + "GB_" + gb.getGBPalette().getLabel() + "." + (Gameboyifier.FORCE_PNG ? "png" : extension);;
-
-    System.out.println(outputFileName);
-
-    gb.writeImage(outputFileName, img);
-    System.out.println("Done!");
-  }
 }

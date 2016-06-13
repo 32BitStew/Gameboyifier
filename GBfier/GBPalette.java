@@ -35,6 +35,8 @@ public class GBPalette {
       this.label = label.toUpperCase();
     }else{
       System.out.println("Palette not found!");
+      this.palette = CLASSIC;
+      this.label = "CLASSIC";
     }
   }
 
