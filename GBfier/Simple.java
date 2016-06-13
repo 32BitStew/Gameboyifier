@@ -109,7 +109,7 @@ public class Simple {
           traverseRecursively(p.toString(),gb);
         }
       } catch (Exception e) {
-        System.out.println(e);
+        System.out.println("Problem traversing folders: " + e);
       }
     } else {
       //Convert file.
@@ -121,7 +121,7 @@ public class Simple {
     try {
       return ImageIO.read(new File(filename));
     } catch (IOException e) {
-      System.out.println(e);
+      System.out.println("Problem reading image: " + e);
     }
     return null;
   }
@@ -133,7 +133,7 @@ public class Simple {
       if(FORCE_PNG) ImageIO.write(img,"png",new File(target));
       else ImageIO.write(img,extension,new File(target));
     } catch (IOException e) {
-      System.out.println(e);
+      System.out.println("Problem writing image: " + e);
     }
     return;
   }
